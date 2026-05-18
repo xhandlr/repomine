@@ -17,9 +17,18 @@ def summary(commits: list[CommitRecord]) -> dict:
     }
 
 
+_NON_CODE = {".gitkeep", ".gitignore", ".gitattributes", "README.md", "LICENSE", "CHANGELOG.md"}
+_NON_CODE_EXTENSIONS = {".lock", ".sum", ".log", ".env", ".png", ".jpg", ".svg", ".ico"}
+
+
 def hotspots(commits: list[CommitRecord], top_n: int = 20) -> list[dict]:
-    """Files ranked by number of times they were modified."""
-    counts = Counter(f for c in commits for f in c.files)
+    """Files ranked by number of times they were modified, excluding non-code files."""
+    def is_code(filename: str) -> bool:
+        name = filename.split("/")[-1]
+        ext = "." + name.split(".")[-1] if "." in name else ""
+        return name not in _NON_CODE and ext not in _NON_CODE_EXTENSIONS
+
+    counts = Counter(f for c in commits for f in c.files if is_code(f))
     return [
         {"file": file, "modifications": count}
         for file, count in counts.most_common(top_n)
