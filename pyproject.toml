@@ -1,7 +1,7 @@
 [project]
 name = "repomine"
 version = "0.1.0"
-description = "Add your description here"
+description = "CLI y API para minería y análisis de repositorios git"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,3 +11,12 @@ dependencies = [
     "typer>=0.25.1",
     "uvicorn>=0.47.0",
 ]
+
+[project.scripts]
+repomine = "cli:app"
+
+[tool.setuptools.packages.find]
+include = ["core*", "backend*"]
+
+[tool.setuptools]
+py-modules = ["cli"]
