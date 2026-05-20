@@ -28,11 +28,14 @@ class OutputFormat(str, Enum):
     csv  = "csv"
 
 
+_RESULTS_DIR = Path(__file__).parent / "results"
+
+
 @app.command()
 def analyze(
     repo: str = typer.Argument(..., help="Path local o URL pública del repositorio"),
     framework: Framework = typer.Option(Framework.generic, "--framework", "-f", help="Framework principal"),
-    output: Path | None = typer.Option(None, "--output", "-o", help="Exportar resultados (ej: report.json, report.csv)"),
+    output: Path | None = typer.Option(None, "--output", "-o", help="Exportar resultados (ej: report.json, report.csv). Por defecto: results/<repo>.json"),
 ):
     """Analiza un repositorio y muestra sus métricas."""
 
@@ -51,9 +54,11 @@ def analyze(
     _print_bus_factor(result["bus_factor"])
     _print_peak_hour(result["activity_by_hour"])
 
-    if output:
-        _export(result, output)
-        console.print(f"\n[green]✔[/green] Exportado en [bold]{output}[/bold]")
+    repo_name = Path(repo).name
+    export_path = output or (_RESULTS_DIR / f"{repo_name}.json")
+    _RESULTS_DIR.mkdir(exist_ok=True)
+    _export(result, export_path)
+    console.print(f"\n[green]✔[/green] Exportado en [bold]{export_path}[/bold]")
 
 
 def _print_summary(s: dict) -> None:
@@ -108,6 +113,7 @@ def _print_peak_hour(activity: dict[int, int]) -> None:
 
 
 def _export(result: dict, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     if path.suffix == ".csv":
         with open(path, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["hash", "author", "date", "type", "message"])
