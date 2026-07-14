@@ -10,7 +10,8 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich import box
 
-from core.git.runner import run_all
+from core.git.runner import run_all as run_git_analysis
+from core.static.runner import run_all as run_static_analysis
 
 app = typer.Typer(help="repomine — análisis de repositorios git")
 console = Console()
@@ -44,20 +45,22 @@ def analyze(
 
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
         task = progress.add_task(f"Analizando [bold]{repo}[/bold]...", total=None)
-        result = run_all(repo)
+        git_result = run_git_analysis(repo)
+        static_result = run_static_analysis(repo)
         progress.update(task, description="[green]✔[/green] Análisis completado")
 
     console.print()
-    _print_summary(result["summary"])
-    _print_hotspots(result["hotspots"])
-    _print_commit_types(result["commit_types"])
-    _print_bus_factor(result["bus_factor"])
-    _print_peak_hour(result["activity_by_hour"])
+    _print_summary(git_result["summary"])
+    _print_hotspots(git_result["hotspots"])
+    _print_commit_types(git_result["commit_types"])
+    _print_bus_factor(git_result["bus_factor"])
+    _print_peak_hour(git_result["activity_by_hour"])
+    _print_top_duplicate_files(static_result["duplication"])
 
     repo_name = Path(repo).name
     export_path = output or (_RESULTS_DIR / f"{repo_name}.json")
     _RESULTS_DIR.mkdir(exist_ok=True)
-    _export(result, export_path)
+    _export(git_result, export_path)
     console.print(f"\n[green]✔[/green] Exportado en [bold]{export_path}[/bold]")
 
 
@@ -83,6 +86,14 @@ def _print_hotspots(hotspots: list[dict]) -> None:
     console.print(table)
     console.print()
 
+def _print_top_duplicate_files(dup: dict):
+    table = Table(title="Top archivos de código duplicado", box=box.ROUNDED)
+    table.add_column("Archivo", style="hot_pink")
+    table.add_column("Repeticiones", justify="right")
+    for d in dup["top_duplicate_files"]:
+        table.add_row(d["filename"], str(d["times"]))
+    console.print(table)
+    console.print()
 
 def _print_commit_types(types: dict[str, int]) -> None:
     table = Table(title="Tipos de commits", box=box.ROUNDED)
@@ -112,16 +123,16 @@ def _print_peak_hour(activity: dict[int, int]) -> None:
     console.print(f"[dim]Hora más activa:[/dim] [bold]{peak}:00[/bold] ({activity[peak]} commits)\n")
 
 
-def _export(result: dict, path: Path) -> None:
+def _export(git_result: dict, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.suffix == ".csv":
         with open(path, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["hash", "author", "date", "type", "message"])
             writer.writeheader()
-            writer.writerows(result["commits"])
+            writer.writerows(git_result["commits"])
     else:
         with open(path, "w") as f:
-            json.dump(result, f, indent=2, default=str)
+            json.dump(git_result, f, indent=2, default=str)
 
 
 if __name__ == "__main__":

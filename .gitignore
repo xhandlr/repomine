@@ -22,6 +22,7 @@ node_modules/
 .vscode/
 .idea/
 *.swp
+.zed
 
 # OS
 .DS_Store
@@ -30,5 +31,6 @@ Thumbs.db
 # Cloned repos (temporary)
 tmp/
 
-# jscpd reports
+# Reports
+report*.csv
 jscpd-report/
