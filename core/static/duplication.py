@@ -50,6 +50,3 @@ def get_most_duplicated_files(data: dict, top_n = 10):
         {"filename": filename, "times": count}
         for filename, count in counts.most_common(top_n)
     ]
-
-if __name__ == "__main__":
-    print(analyze_duplication("/home/cadel/Escritorio/gestor-practicas"))
