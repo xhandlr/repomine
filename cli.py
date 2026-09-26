@@ -60,7 +60,7 @@ def analyze(
     repo_name = Path(repo).name
     export_path = output or (_RESULTS_DIR / f"{repo_name}.json")
     _RESULTS_DIR.mkdir(exist_ok=True)
-    _export(git_result, export_path)
+    _export(git_result, static_result, export_path)
     console.print(f"\n[green]✔[/green] Exportado en [bold]{export_path}[/bold]")
 
 
@@ -123,7 +123,7 @@ def _print_peak_hour(activity: dict[int, int]) -> None:
     console.print(f"[dim]Hora más activa:[/dim] [bold]{peak}:00[/bold] ({activity[peak]} commits)\n")
 
 
-def _export(git_result: dict, path: Path) -> None:
+def _export(git_result: dict, static_result: dict, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.suffix == ".csv":
         with open(path, "w", newline="") as f:
@@ -132,7 +132,7 @@ def _export(git_result: dict, path: Path) -> None:
             writer.writerows(git_result["commits"])
     else:
         with open(path, "w") as f:
-            json.dump(git_result, f, indent=2, default=str)
+            json.dump({**git_result, "static_analysis": static_result}, f, indent=2, default=str)
 
 
 if __name__ == "__main__":
