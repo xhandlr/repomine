@@ -3,7 +3,7 @@ import json
 
 def analyze_circular_dependencies(path: str):
     result = subprocess.run(
-        ["npx", "madge", "--circular", "--json", path],
+        ["npx", "--yes", "madge", "--circular", "--json", "--exclude", "node_modules|dist", path],
         capture_output=True,
         text=True
     )

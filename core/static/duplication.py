@@ -3,7 +3,11 @@ import subprocess
 import json
 
 def analyze_duplication(path: str, output_dir: str = "jscpd-report") -> dict:
-    subprocess.run(["npx", "jscpd", path, "--reporters", "json", "--output", output_dir], check=True)
+    subprocess.run(
+        ["npx", "--yes", "jscpd", path, "--reporters", "json", "--output", output_dir,
+         "--ignore", "**/node_modules/**,**/dist/**,**/.git/**"],
+        check=True,
+    )
     with open(f"{output_dir}/jscpd-report.json") as file:
         data = json.load(file)
 
