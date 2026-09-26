@@ -2,18 +2,26 @@ from collections import Counter
 
 from .extractor import CommitRecord
 
-# Conventional Commits types mapped to their keyword prefixes
+# Conventional Commits types mapped to their keyword prefixes (English + Spanish)
 _TYPES: dict[str, set[str]] = {
-    "feat":     {"feat", "feature"},
-    "fix":      {"fix", "bug", "hotfix", "patch", "defect", "error", "crash"},
-    "refactor": {"refactor", "restructure"},
-    "chore":    {"chore", "bump", "update", "upgrade", "deps"},
-    "docs":     {"docs", "doc", "documentation"},
-    "test":     {"test", "tests", "spec"},
-    "perf":     {"perf", "performance", "optimize", "optimise"},
+    "feat":     {"feat", "feature",
+                 "agregado", "agregada", "agregados", "agregadas", "agrega", "agregar",
+                 "nuevo", "nueva", "implementado", "implementada", "implementa", "implementar"},
+    "fix":      {"fix", "bug", "hotfix", "patch", "defect", "error", "crash",
+                 "arreglado", "arreglada", "arregla", "arreglar",
+                 "corregido", "corregida", "corrige", "corregir",
+                 "soluciona", "solucionado"},
+    "refactor": {"refactor", "restructure",
+                 "reestructura", "reestructurado", "reestructurada", "refactoriza", "refactorizado"},
+    "chore":    {"chore", "bump", "update", "upgrade", "deps",
+                 "actualizado", "actualizada", "actualiza", "actualizar",
+                 "eliminado", "eliminada", "elimina", "eliminar"},
+    "docs":     {"docs", "doc", "documentation", "documentacion", "documentación"},
+    "test":     {"test", "tests", "spec", "prueba", "pruebas"},
+    "perf":     {"perf", "performance", "optimize", "optimise", "optimizado", "optimizada", "optimiza"},
     "ci":       {"ci", "cd", "pipeline", "workflow", "github-actions"},
-    "style":    {"style", "format", "lint", "whitespace"},
-    "revert":   {"revert"},
+    "style":    {"style", "format", "lint", "whitespace", "formato"},
+    "revert":   {"revert", "revertido", "revertida", "revierte"},
 }
 
 
