@@ -56,6 +56,7 @@ def analyze(
     _print_bus_factor(git_result["bus_factor"])
     _print_peak_hour(git_result["activity_by_hour"])
     _print_top_duplicate_files(static_result["duplication"])
+    _print_most_complex_functions(static_result["complexity"])
 
     repo_name = Path(repo).name
     export_path = output or (_RESULTS_DIR / f"{repo_name}.json")
@@ -94,6 +95,18 @@ def _print_top_duplicate_files(dup: dict):
         table.add_row(d["filename"], str(d["times"]))
     console.print(table)
     console.print()
+
+def _print_most_complex_functions(complexity: dict) -> None:
+    table = Table(title="Funciones con mayor complejidad ciclomática", box=box.ROUNDED)
+    table.add_column("Archivo", style="cyan")
+    table.add_column("Función")
+    table.add_column("CCN", justify="right")
+    table.add_column("NLOC", justify="right")
+    for f in complexity["most_complex_functions"]:
+        table.add_row(f["file"], f["function"], str(f["cyclomatic_complexity"]), str(f["nloc"]))
+    console.print(table)
+    console.print()
+
 
 def _print_commit_types(types: dict[str, int]) -> None:
     table = Table(title="Tipos de commits", box=box.ROUNDED)
